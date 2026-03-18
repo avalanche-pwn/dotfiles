@@ -1,0 +1,9 @@
+autoload/
+black/
+config/
+plugged/
+sessions/
+spell/
+swapfiles/
+undodir/
+venv/

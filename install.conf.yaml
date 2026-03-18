@@ -1,0 +1,15 @@
+- defaults:
+    link:
+      relink: true
+
+- clean: ['~']
+
+- link:
+    ~/.tmux.conf: .tmux.conf
+    ~/.vim: .vim
+
+- create:
+    - ~/.vim/undodir
+    - ~/.vim/sessions
+    - ~/.vim/swapfiles
+

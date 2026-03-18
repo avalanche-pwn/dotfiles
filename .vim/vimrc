@@ -1,0 +1,399 @@
+set nocompatible
+" syntax enable
+" filetype plugin on
+filetype off
+
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+Plug 'psf/black', {'branch': 'stable'}
+Plug 'gruvbox-community/gruvbox'
+Plug 'joshdick/onedark.vim'
+Plug 'tpope/vim-surround'
+" Plug 'pangloss/vim-javascript'
+" Plug 'mxw/vim-jsx'
+" Plug 'mattn/emmet-vim'
+" Plug 'editorconfig/editorconfig-vim'
+" Plug 'posva/vim-vue'
+Plug 'cakebaker/scss-syntax.vim'
+" Plug 'ycm-core/YouCompleteMe', {'do': function('BuildYCM')}
+" Plug 'dense-analysis/ale'
+Plug 'yegappan/lsp'
+" Plug 'arrufat/vala.vim'
+" Plug 'peterhoeg/vim-qml'
+Plug 'bfrg/vim-cpp-modern'
+" Plug 'pwntester/codeql.nvim'
+" temporary sinc pasting doesn't work on wayland
+Plug 'jasonccox/vim-wayland-clipboard'
+Plug 'ARM9/arm-syntax-vim'
+Plug 'airblade/vim-gitgutter'
+call plug#end()            " required
+filetype plugin indent on    " required
+
+packadd! termdebug
+let g:termdebug_config = {}
+let g:termdebug_config['command'] = ['sudo', 'gdb', '-nx']
+let g:termdebug_config['variables_window'] = 1
+let g:termdebug_config['wide'] = 1
+
+set encoding=utf-8
+
+" Setting up theme
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+set termguicolors
+syntax on
+colorscheme gruvbox
+set background=dark
+" colorscheme onedark
+"
+set listchars=tab:⟶\ ,trail:·,extends:>,precedes:<,nbsp:%,space:.
+
+set updatetime=1000
+" auto reload file on outside changes -> mainly for git
+set autoread
+" auto reload after for seconds of idle cursor
+au BufEnter,CursorHold,CursorHoldI * checktime
+
+"Set up tabs
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
+let mapleader = ","
+
+silent! helptags ALL
+" Sane defaults
+set relativenumber
+set number
+set cursorline
+set scrolloff=8
+set nowrap
+set incsearch
+set hlsearch
+set autoindent
+set wildmenu
+set wildignorecase
+set wildignore+=**/.git/**,**/__pycache__/**,**/venv/**,**/node_modules/**,**/dist/**,**/build/**,*.o,*.pyc,*.swp
+set wildmode=full
+
+" Setting up file tree
+set path+=**
+
+
+let g:vim_session_dir='~/.vim/sessions/'
+
+function! GetSessionName()
+    let l:cwd = getcwd()
+    return substitute(l:cwd, '/', '_', 'g') . '.vim'
+endfunction
+
+function! SaveSession()
+    execute 'mksession! ' . g:vim_session_dir . GetSessionName()
+endfunction
+
+function! ShouldLoadSession()
+    return len(v:argv) <= 1 || empty(glob(v:argv[1]))
+endfunction
+
+function! LoadSession()
+    if !ShouldLoadSession()
+        return
+    endif
+
+    let l:session_path = g:vim_session_dir . GetSessionName()
+    if empty(glob(l:session_path))
+        return
+    endif
+
+    let l:choice = confirm('There exists a session for ' . getcwd() . '. Do you want to load it?', "&Yes\n&No", 2)
+    if choice == 1
+        execute 'source ' . l:session_path
+    endif
+endfunction
+
+autocmd VimLeave * call SaveSession()
+autocmd VimEnter * call LoadSession()
+
+" setting up emmet
+let g:user_emmet_mode='n'
+let g:user_emmet_leader_key='e'
+let g:user_emmet_settings = {
+  \  'javascript.jsx' : {
+    \      'extends' : 'jsx',
+    \  },
+  \}
+
+let g:tex_flavor='tex'
+augroup tabfix
+    autocmd FileType vue setlocal tabstop=2 shiftwidth=2
+    autocmd FileType html setlocal tabstop=2 shiftwidth=2
+    autocmd FileType css setlocal tabstop=2 shiftwidth=2
+    autocmd FileType scss setlocal tabstop=2 shiftwidth=2
+    autocmd FileType javascript.jsx setlocal tabstop=2 shiftwidth=2
+    autocmd FileType c setlocal tabstop=4 shiftwidth=4
+    autocmd FileType h setlocal tabstop=4 shiftwidth=4
+    autocmd FileType cpp setlocal tabstop=4 shiftwidth=4
+    autocmd FileType xml setlocal tabstop=2 shiftwidth=2
+    autocmd FileType rc setlocal tabstop=2 shiftwidth=2 syntax=xml
+    autocmd FileType java setlocal tabstop=4 shiftwidth=4
+    autocmd FileType qml setlocal tabstop=2 shiftwidth=2
+    autocmd FileType go setlocal tabstop=4 shiftwidth=4 keywordprg=:LspHover
+    autocmd FileType makdown setlocal keywordprg=:LspHover
+augroup END
+
+au BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
+
+" Setting up correct runcmd for some files
+let g:gruncmd = "echo 'If you wish to be able to run using this shortcut set g:gruncmd or b:runcmd.'"
+let b:runcmd = g:gruncmd
+function! Run()
+    if g:gruncmd == "echo 'If you wish to be able to run using this shortcut set g:gruncmd or b:runcmd.'" || g:gruncmd == ""
+        call system('tmux display-popup -E "(cd '.getcwd().' && '.b:runcmd.') && read -n1 kbd"')
+    else
+        call system('tmux display-popup -E "(cd '.getcwd().' && '.g:gruncmd.') && read -n1 kbd"')
+    endif
+endfunction
+
+augroup rcmd
+    autocmd FileType python let b:runcmd="python ".@%
+    autocmd FileType sh let b:runcmd="/bin/sh ".@%
+augroup END
+
+" Setting up Black for python
+let g:black_linelength = 79
+
+" Setting up netrw tree file explorer
+let g:netrw_banner = 0
+let g:netrw_alto = 1
+let g:netrw_preview =0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
+
+" My shortcuts
+nnoremap <silent><leader>t :Lexplore<CR>
+nnoremap <leader>n :nohl<CR>
+nnoremap <silent><leader>/ ^I# <ESC>
+nnoremap <silent><leader>? $F#lldF#
+nnoremap <silent><leader>bo :put =readfile('/home/antoni/Szablony/script.py')<CR>ggdd
+nnoremap <silent><leader>e :silent ! chmod +x ./%<CR>:redraw!<CR>
+nnoremap <silent><leader>r :call Run()<CR>
+nnoremap <leader>b :Black<CR>
+" nnoremap <leader>p "+p
+" nnoremap <leader>P "+P
+" nnoremap <leader>y "+y
+" nnoremap <leader>Y "+Y
+" temporary workaround for pasting because it doesnt work on wayland
+nmap <leader>p "+p
+nmap <leader>P "+P
+nmap <leader>y "+y
+nmap <leader>Y "+Y
+
+" Remaps of annoying things I might click
+nnoremap U :echo<Space>'CAPS LOCK'<CR>
+
+function! FZF_all()
+    let file = system('find . -type f |fzf --tmux top,50%,20% ')
+    :execute 'edit' file
+endfunction
+
+function! FZF() 
+    if system('git rev-parse --is-inside-work-tree 2>/dev/null') =~# 'true'
+        let file = system('git ls-files | fzf --tmux top,50%,20%')
+    else
+        let file = system('find . -type f |fzf --tmux top,50%,20%')
+    endif
+    :execute 'edit' file
+endfunction
+" Command abbreviations
+cnoreabbrev Q q
+cnoreabbrev W w
+cnoreabbrev F call FZF()<CR>
+cnoreabbrev f call FZF()<CR>
+cnoreabbrev fa call FZF_all()<CR>
+cnoreabbrev Vr vert res
+cnoreabbrev vr vert res
+
+function! ToggleNumbers()
+    if &rnu
+        set nu nornu
+    else
+        set nu rnu
+    endif
+endfunction
+
+nnoremap <silent><leader>g :call ToggleNumbers()<CR>
+
+let &grepprg="git grep -n -I $*"
+command! -nargs=+ Grep {
+    execute 'silent grep! <args> ' | copen
+    redraw! " executing grep tends to messup rendering
+}
+
+cnoreabbrev G Grep
+cnoreabbrev grep Grep
+
+" Always open quck fix list at the bottom 
+" https://stackoverflow.com/questions/6726783/how-to-change-the-default-position-of-quickfix-window-in-vim
+:autocmd FileType qf wincmd J
+" Close search results
+nnoremap <silent><leader>c :cclose<CR>
+" Show prev search results
+nnoremap <silent><leader>co :cold<CR>
+" Show next search results
+nnoremap <silent><leader>cn :cnew<CR>
+
+" Esc key remap
+" AutoClose is for auto closing brackets
+inoremap <leader><leader> <Esc>
+nnoremap <leader><leader> <Esc>
+vnoremap <leader><leader> <Esc>
+onoremap <leader><leader> <Esc>
+cnoremap <leader><leader> <C-C><Esc>
+" The consequence of using ,,(<leader><leader>) as esc is that coma is to slow
+" in normal mode, so I remap it as backspace using
+nnoremap <BS> ,
+
+" Disable normal Esc
+inoremap <Esc> <Nop>
+" nnoremap <Esc> <Nop>
+vnoremap <Esc> <Nop>
+onoremap <Esc> <Nop>
+cnoremap <C-C><Esc> <Nop>
+
+" Disable arrow keyes
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
+inoremap <Up> <Nop>
+inoremap <Down> <Nop>
+inoremap <Left> <Nop>
+inoremap <Right> <Nop>
+
+" Split resizing
+nmap <C-J> <C-W>-<C-W>-
+nmap <C-K> <C-W>+<C-W>+
+nmap <C-H> <C-W>><C-W>>
+nmap <C-L> <C-W><<C-W><
+
+
+" Quick macro
+nnoremap Q @q
+
+" Set up ycm complete
+nnoremap <leader>gd :LspGotoDefinition<CR>
+nnoremap <leader>gi :LspGotoImpl<CR>
+nnoremap <leader>gr :LspShowReferences<CR>
+nnoremap <leader>k :LspPeekDefinition<CR>
+nnoremap <leader>f :LspFormat<CR>
+nnoremap <leader>r :LspRename<CR>
+nnoremap <leader>s :LspShowSignature<CR>
+nnoremap <leader>dd :LspDiagShow<Cr>
+nnoremap <leader>lfw :LspSymbolSearch<CR>
+nnoremap <leader>lfd :LspDocumentSymbol<CR>
+nnoremap <leader>ld :LspPeekDefinition<CR>
+nnoremap <leader>lr :LspPeekReferences<CR>
+nnoremap <leader>la :LspCodeAction<CR>
+
+
+" Quick vimrc edit
+cnoreabbrev vimrc e ~/.vim/vimrc
+cnoreabbrev vabbr e ~/.vim/abbr.vim
+cnoreabbrev qtilerc e ~/.config/qtile/config.py
+cnoreabbrev tmuxrc e ~/.tmux.conf
+cnoreabbrev soc so ~/.vim/vimrc
+
+let lspOpts = #{autoHighlightDiags: v:true}
+
+autocmd User LspSetup call LspOptionsSet(lspOpts)
+autocmd BufEnter,CursorHold * silent LspDiag current
+
+let lspServers = [#{
+	\	  name: 'clang',
+	\	  filetype: ['c', 'cpp'],
+	\	  path: 'clangd',
+	\	  args: ['--background-index', '--enable-config', '--header-insertion=never', '--clang-tidy']
+	\ },
+    \ #{
+	\    name: 'python-lsp-server',
+	\    filetype: ['python'],
+	\    path: '/home/antoni/Tools/pylsp/venv/bin/python',
+	\    args: ['-m', 'pylsp']
+	\  },
+    \ #{
+	\    name: 'texlab',
+	\    filetype: ['tex'],
+	\    path: 'texlab',
+	\    args: ['run']
+	\  },
+    \ #{
+	\    name: 'rust_hdl',
+	\    filetype: ['vhdl'],
+	\    path: 'vhdl_ls',
+	\  },
+    \ #{
+	\    name: 'iwe',
+	\    filetype: ['markdown'],
+	\    path: 'iwes',
+	\  },
+    \ #{
+	\    name: 'golang',
+	\    filetype: ['go', 'gomod'],
+	\    path: 'gopls',
+	\    args: ['serve'],
+	\    syncInit: v:true
+	\  }]
+autocmd User LspSetup call LspAddServer(lspServers)
+
+
+" Persisting undo
+set undofile
+set undodir=~/.vim/undodir
+
+" Save swap files out of tree
+set directory=$HOME/.vim/swapfiles//
+
+" Statusline setup
+function! StatusRight()
+    if winwidth(winnr()) >50
+        return " [".&filetype."] ".&fileencoding."[".&fileformat."]"
+    else
+        return ""
+    endif
+endfunction
+
+function! LintStatus()
+    "let lint_dict = ale#statusline#FirstProblem(bufnr('%'), 'error')
+    "if empty(lint_dict)
+    "    return ""
+    "else
+     "   return " Error: ".lint_dict["lnum"]
+    "endif
+	return "1"
+endfunction
+
+set laststatus=2
+set statusline=
+set statusline+=%#DiffChange#
+set statusline+=\ %f
+set statusline+=\ "  "
+set statusline+=%#StatusLine#
+set statusline+=%=
+set statusline+=%#warningmsg#
+set statusline+=%{LintStatus()}
+set statusline+=%#LineNr#
+set statusline+=\ %b
+set statusline+=\ "  "
+set statusline+=%#DiffText#
+set statusline+=%{StatusRight()}
+set statusline+=\ %l:%c
+set statusline+=\ " "
+set statusline+=%{wordcount().words}

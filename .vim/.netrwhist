@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =1
+let g:netrw_dirhist_1='/home/antoni/.vim'
+let g:netrw_dirhist_0='/home/antoni/Documents/Cline'
+let g:netrw_dirhist_9='/home/antoni/Documents'
+let g:netrw_dirhist_8='/home/antoni/Documents/projects'
+let g:netrw_dirhist_7='/home/antoni/Documents/projects/zephyr_hacking'
+let g:netrw_dirhist_6='/home/antoni/Documents/projects/zephyr_hacking/nrf54l15-dk-devenv'
+let g:netrw_dirhist_5='/home/antoni/Documents/projects/zephyr_hacking/nrf54l15-dk-devenv/workspace'
+let g:netrw_dirhist_4='/home/antoni/Documents/projects/zephyr_hacking/nrf54l15-dk-devenv/workspace/zephyr'
+let g:netrw_dirhist_3='/home/antoni/Documents/projects/zephyr_hacking/zephyr/tests/bluetooth/tester/src/btp'
+let g:netrw_dirhist_2='/home/antoni/Documents/projects/zephyr_hacking/zephyr/tests/bluetooth/tester/src'

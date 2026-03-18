@@ -1,0 +1,24 @@
+[core]
+	autocrlf = input
+	pager = less -FRSX
+	editor = vim
+[user]
+	name = Antoni Duda
+	email = antoni.duda@programmer.net
+[rerere]
+	enabled = true
+	autoupdate = true
+[rebase]
+	stat = true
+[color]
+	ui = auto
+[merge]
+	tool = meld
+[username]
+	email = antoni.duda@programmer.net
+[credential]
+	helper = store
+[alias]
+	ci = commit
+	st = status
+	br = branch

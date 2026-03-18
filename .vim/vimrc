@@ -97,7 +97,7 @@ function! SaveSession()
 endfunction
 
 function! ShouldLoadSession()
-    return len(v:argv) <= 1 || empty(glob(v:argv[1]))
+    return expand('%:p') == ''
 endfunction
 
 function! LoadSession()

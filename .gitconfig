@@ -4,7 +4,7 @@
 	editor = vim
 [user]
 	name = Antoni Duda
-	email = antoni.duda@programmer.net
+	email = antoni.duda@nordicsemi.no
 [rerere]
 	enabled = true
 	autoupdate = true
@@ -14,11 +14,9 @@
 	ui = auto
 [merge]
 	tool = meld
-[username]
-	email = antoni.duda@programmer.net
 [credential]
 	helper = store
 [alias]
-	ci = commit
+	ci = commit -s
 	st = status
 	br = branch

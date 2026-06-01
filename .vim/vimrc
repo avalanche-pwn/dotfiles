@@ -53,6 +53,8 @@ set background=dark
 "
 set listchars=tab:⟶\ ,trail:·,extends:>,precedes:<,nbsp:%,space:.
 
+let gitcommit_summary_length = 72
+
 set updatetime=1000
 " auto reload file on outside changes -> mainly for git
 set autoread
@@ -135,7 +137,7 @@ augroup tabfix
     autocmd FileType css setlocal tabstop=2 shiftwidth=2
     autocmd FileType scss setlocal tabstop=2 shiftwidth=2
     autocmd FileType javascript.jsx setlocal tabstop=2 shiftwidth=2
-    autocmd FileType c setlocal tabstop=4 shiftwidth=4
+    autocmd FileType c setlocal tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab keywordprg=:LspHover
     autocmd FileType h setlocal tabstop=4 shiftwidth=4
     autocmd FileType cpp setlocal tabstop=4 shiftwidth=4
     autocmd FileType xml setlocal tabstop=2 shiftwidth=2
@@ -144,6 +146,8 @@ augroup tabfix
     autocmd FileType qml setlocal tabstop=2 shiftwidth=2
     autocmd FileType go setlocal tabstop=4 shiftwidth=4 keywordprg=:LspHover
     autocmd FileType makdown setlocal keywordprg=:LspHover
+    autocmd FileType kconfig setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
+    autocmd FileType gitconfig setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
 augroup END
 
 au BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7

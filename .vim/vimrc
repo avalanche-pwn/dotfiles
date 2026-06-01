@@ -293,7 +293,7 @@ nnoremap <leader>gd :LspGotoDefinition<CR>
 nnoremap <leader>gi :LspGotoImpl<CR>
 nnoremap <leader>gr :LspShowReferences<CR>
 nnoremap <leader>k :LspPeekDefinition<CR>
-nnoremap <leader>f :LspFormat<CR>
+vnoremap <leader>f :LspFormat<CR>
 nnoremap <leader>r :LspRename<CR>
 nnoremap <leader>s :LspShowSignature<CR>
 nnoremap <leader>dd :LspDiagShow<Cr>

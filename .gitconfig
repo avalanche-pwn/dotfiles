@@ -2,6 +2,9 @@
 	autocrlf = input
 	pager = less -FRSX
 	editor = vim
+	abbrev = 12
+[pretty]
+	fixes = Fixes: %h (\"%s\")
 [user]
 	name = Antoni Duda
 	email = antoni.duda@nordicsemi.no
@@ -14,6 +17,8 @@
 	ui = auto
 [merge]
 	tool = meld
+[mergetool "meld"]
+    cmd = meld "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
 [credential]
 	helper = store
 [alias]
@@ -22,3 +27,6 @@
 	br = branch
 	# From https://stackoverflow.com/questions/1057564/pretty-git-branch-graphs
 	lg = log -n10 --graph --abbrev-commit --decorate --format=format:'%C(bold yellow)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+	co = checkout
+	ri = !git rebase -i $(git merge-base ${1:-main} HEAD)
+	fpush = push --force-with-lease

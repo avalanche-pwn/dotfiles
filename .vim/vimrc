@@ -327,10 +327,22 @@ let lspServers = [#{
 	\	  args: ['--background-index', '--enable-config', '--header-insertion=never', '--clang-tidy']
 	\ },
     \ #{
-	\    name: 'python-lsp-server',
+	\    name: 'ruff',
 	\    filetype: ['python'],
-	\    path: '/home/antoni/Tools/pylsp/venv/bin/python',
-	\    args: ['-m', 'pylsp']
+	\    path: '/home/andu-local/Tools/pylsp/venv/bin/python',
+	\    args: ['-m', 'pylsp'],
+    \    workspaceConfig: #{
+    \       pylsp: #{
+    \         plugins: #{
+    \           ruff: #{
+    \             enabled: v:true,
+    \             formatEnabled: v:true,
+    \             format: ['I'],
+    \             extendSelect: ['I'],
+    \           }
+    \         }
+    \       }
+    \     }
 	\  },
     \ #{
 	\    name: 'texlab',
